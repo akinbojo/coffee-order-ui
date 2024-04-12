@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f7f1e3;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      text-align: center;
+      width: 80%;
+      max-width: 600px;
+    }
+    button {
+      background-color: #bdaa96;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 5px;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #a3907c;
+    }
+    #cart {
+      border: 1px solid #bdaa96;
+      padding: 10px;
+      margin-top: 20px;
+      background-color: #fff;
+    }
+    .cart-item {
+      background-color: #e1dcd8;
+      margin: 5px;
+      padding: 5px;
+      cursor: pointer;
+    }
+    .cart-item:hover {
+      background-color: #cbc3bd;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Select a Beverage</h1>
+  <button onclick="selectBeverage('DarkRoast')">DarkRoast</button>
+  <button onclick="selectBeverage('HouseBlend')">HouseBlend</button>
+  <button onclick ="selectBeverage('Espresso')">Espresso</button>
+  
+  <div id="cart">
+    <h2>Your Order:</h2>
+    <div id="cartItems"></div>
+  </div>
+
+\  <button onclick="goToCondiments()">Next</button>
+</div>
+
+<script>
+  function updateCartDisplay() {
+    const cartItems = document.getElementById('cartItems');
+    cartItems.innerHTML = ''; 
+    
+    const selectedBeverage = localStorage.getItem('selectedBeverage');
+    if (selectedBeverage) {
+      const item = document.createElement('div');
+      item.className = 'cart-item';
+      item.textContent = selectedBeverage;
+      item.onclick = function() {
+        localStorage.removeItem('selectedBeverage');
+        window.location.href = 'beverages.html';
+      };
+      cartItems.appendChild(item);
+    }
+  }
+
+  function selectBeverage(beverageName) {
+    localStorage.setItem('selectedBeverage', beverageName);
+    updateCartDisplay(); 
+  }
+  
+  function goToCondiments() {
+    if (localStorage.getItem('selectedBeverage')) {
+      window.location.href = 'condiments.html';
+    } else {
+      alert('Please select a beverage first.');
+    }
+  }
+  
+  updateCartDisplay();
+</script>
+
+</body>
+</html>

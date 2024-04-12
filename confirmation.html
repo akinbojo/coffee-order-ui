@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- ... existing head elements ... -->
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f7f1e3; /* Beige-brownish background color */
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      text-align: center;
+    }
+    .cart-item {
+      padding: 5px;
+      border: 1px solid #ccc;
+      margin: 5px;
+      cursor: pointer;
+    }
+    .cart-item:hover {
+      background-color: #f0f0f0;
+    }
+    .order-button {
+      background-color: #bdaa96;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .order-button:hover {
+      background-color: #a3907c;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Order Confirmation</h1>
+    <div id="orderSummary">
+      <h2>Your Order:</h2>
+      <div id="beverageInCart"></div>
+      <div id="condimentsInCart"></div>
+    </div>
+    <div id="orderID">Order ID: </div> 
+    <div id="totalCost">Total Cost: </div> 
+  
+    <button class="order-button" onclick="sendOrder()">Send Order</button> 
+    <button onclick="startNewOrder()">Start New Order</button>
+  </div>
+
+<script>
+  let cart = {
+    beverage: localStorage.getItem('selectedBeverage'),
+    condiments: JSON.parse(localStorage.getItem('cart')) || [],
+  };
+
+  function displayOrderSummary() {
+    const beverageCartElement = document.getElementById('beverageInCart');
+    const condimentsCartElement = document.getElementById('condimentsInCart');
+    
+    beverageCartElement.innerHTML = '';
+    condimentsCartElement.innerHTML = '';
+    
+    if (cart.beverage) {
+      const beverageElement = document.createElement('div');
+      beverageElement.innerText = cart.beverage;
+      beverageElement.className = 'cart-item';
+      beverageCartElement.appendChild(beverageElement);
+    }
+    
+    cart.condiments.forEach(condiment => {
+      const condimentElement = document.createElement('div');
+      condimentElement.innerText = condiment;
+      condimentElement.className = 'cart-item';
+      condimentsCartElement.appendChild(condimentElement);
+    });
+  }
+  
+  function startNewOrder() {
+    localStorage.clear();
+    window.location.href = 'index.html';
+  }
+  
+  displayOrderSummary();
+
+  function sendOrder() {
+    const order = {
+        beverage: localStorage.getItem('selectedBeverage'),
+        condiments: JSON.parse(localStorage.getItem('cart')) || [],
+    };
+
+    fetch('https://coffee-order-akinbojo.onrender.com/orders', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(order),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Error: ' + data.error);
+        } else {
+            document.getElementById('orderID').innerText = 'Order ID: ' + data.id;
+            document.getElementById('totalCost').innerText = 'Total Cost: $' + data.cost.toFixed(2);
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
+
+
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- ... existing head elements ... -->
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f7f1e3;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    button {
+      background-color: #bdaa96;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin: 5px;
+    }
+    button:hover {
+      background-color: #a3907c;
+    }
+    .cart-item {
+      padding: 10px;
+      background-color: #e1dcd8;
+      margin: 5px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .cart-item:hover {
+      background-color: #cbc3bd;
+    }
+    #cart {
+      border: 1px solid #bdaa96;
+      padding: 10px;
+      margin-top: 20px;
+      border-radius: 5px;
+    }
+    h1, h2 {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Add Condiments</h1>
+  <button onclick="toggleCondiment('Milk')">Milk</button>
+  <button onclick="toggleCondiment('Soy')">Soy</button>
+  <button onclick="toggleCondiment('Whip')">Whip</button>
+  <button onclick="toggleCondiment('Mocha')">Mocha</button>
+
+  
+  <!-- Cart display -->
+  <div id="cart">
+    <h2>Your Order:</h2>
+    <div id="beverageInCart"></div>
+    <div id="condimentsInCart"></div>
+  </div>
+  
+  <button onclick="goToConfirmation()">Confirm Order</button>
+</div>
+
+<script>
+  let cart = {
+    beverage: localStorage.getItem('selectedBeverage'),
+    condiments: JSON.parse(localStorage.getItem('cart')) || [],
+  };
+  
+  function toggleCondiment(condimentName) {
+    const condimentIndex = cart.condiments.indexOf(condimentName);
+    if (condimentIndex > -1) {
+      cart.condiments.splice(condimentIndex, 1);
+    } else {
+      cart.condiments.push(condimentName);
+    }
+    localStorage.setItem('cart', JSON.stringify(cart.condiments));
+    updateCartDisplay();
+  }
+  
+  function updateCartDisplay() {
+    const beverageCartElement = document.getElementById('beverageInCart');
+    const condimentsCartElement = document.getElementById('condimentsInCart');
+    
+    beverageCartElement.innerHTML = '';
+    condimentsCartElement.innerHTML = '';
+    
+    if (cart.beverage) {
+      const beverageElement = document.createElement('div');
+      beverageElement.innerText = cart.beverage;
+      beverageElement.className = 'cart-item';
+      beverageElement.onclick = function() {
+        localStorage.removeItem('selectedBeverage');
+        localStorage.removeItem('cart');
+        window.location.href = 'beverages.html';
+      };
+      beverageCartElement.appendChild(beverageElement);
+    }
+    
+    cart.condiments.forEach(condiment => {
+      const condimentElement = document.createElement('div');
+      condimentElement.innerText = condiment;
+      condimentElement.className = 'cart-item';
+      condimentElement.onclick = function() {
+        toggleCondiment(condiment);
+      };
+      condimentsCartElement.appendChild(condimentElement);
+    });
+  }
+  
+  function goToConfirmation() {
+    window.location.href = 'confirmation.html';
+  }
+  
+  updateCartDisplay();
+</script>
+
+</body>
+</html>
