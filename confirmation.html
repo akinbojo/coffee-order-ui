@@ -53,40 +53,54 @@
   
     <button class="order-button" onclick="sendOrder()">Send Order</button> 
     <button onclick="startNewOrder()">Start New Order</button>
+    
   </div>
 
+<script src="configuration.js"></script>
+<script src="register.js"></script>
+
 <script>
+  let orderID = generateOrderId();
+
   let cart = {
     beverage: localStorage.getItem('selectedBeverage'),
     condiments: JSON.parse(localStorage.getItem('cart')) || [],
   };
 
   function displayOrderSummary() {
+    document.getElementById('orderID').innerText = 'Order ID: ' + orderID;
+
     const beverageCartElement = document.getElementById('beverageInCart');
     const condimentsCartElement = document.getElementById('condimentsInCart');
-    
+
     beverageCartElement.innerHTML = '';
     condimentsCartElement.innerHTML = '';
-    
+
     if (cart.beverage) {
-      const beverageElement = document.createElement('div');
-      beverageElement.innerText = cart.beverage;
-      beverageElement.className = 'cart-item';
-      beverageCartElement.appendChild(beverageElement);
+        const beverageElement = document.createElement('div');
+        beverageElement.innerText = cart.beverage;
+        beverageElement.className = 'cart-item';
+        beverageCartElement.appendChild(beverageElement);
     }
-    
+
     cart.condiments.forEach(condiment => {
-      const condimentElement = document.createElement('div');
-      condimentElement.innerText = condiment;
-      condimentElement.className = 'cart-item';
-      condimentsCartElement.appendChild(condimentElement);
+        const condimentElement = document.createElement('div');
+        condimentElement.innerText = condiment;
+        condimentElement.className = 'cart-item';
+        condimentsCartElement.appendChild(condimentElement);
     });
-  }
+}
+
   
-  function startNewOrder() {
-    localStorage.clear();
-    window.location.href = 'index.html';
-  }
+      function startNewOrder() {
+        localStorage.removeItem('selectedBeverage');
+        localStorage.removeItem('cart');
+        window.location.href = 'index.html';  // Redirect to the start page without logging out
+    }
+      function generateOrderId() {
+        return 'order-' + Math.floor(1000 + Math.random() * 9000);
+      }
+
   
   displayOrderSummary();
 
@@ -96,24 +110,34 @@
         condiments: JSON.parse(localStorage.getItem('cart')) || [],
     };
 
-    fetch('https://coffee-order-akinbojo.onrender.com/orders', {
+    let host = getHost();
+    let token = getTheToken(); // Ensure you have a function or a way to retrieve the stored token
+
+    fetch(`${host}/orders`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`  // Assuming Bearer token authentication
         },
-        body: JSON.stringify(order),
+        body: JSON.stringify(order)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();  // This will fail if there is no JSON to parse
+    })
     .then(data => {
         if (data.error) {
             alert('Error: ' + data.error);
         } else {
-            document.getElementById('orderID').innerText = 'Order ID: ' + data.id;
+            document.getElementById('orderID').innerText = 'Order ID: ' + orderID;
             document.getElementById('totalCost').innerText = 'Total Cost: $' + data.cost.toFixed(2);
         }
     })
-    .catch((error) => {
+    .catch(error => {
         console.error('Error:', error);
+        alert('Failed to send order. Please try again.');
     });
 }
 

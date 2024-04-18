@@ -61,7 +61,13 @@
   </div>
 
 \  <button onclick="goToCondiments()">Next</button>
+  <button onclick="logout()">Logout</button>
+
 </div>
+
+<script src = "configuration.js"></script>
+<script src = "register.js"></script>
+
 
 <script>
   function updateCartDisplay() {
@@ -81,10 +87,25 @@
     }
   }
 
+  
+
   function selectBeverage(beverageName) {
+
+    if (!isLoggedIn()) {
+      alert('You must be logged in to create a beverage!');
+      window.location.href = 'login.html';
+      return;
+    }
+
+
+
+
+
     localStorage.setItem('selectedBeverage', beverageName);
     updateCartDisplay(); 
   }
+
+
   
   function goToCondiments() {
     if (localStorage.getItem('selectedBeverage')) {
@@ -92,6 +113,16 @@
     } else {
       alert('Please select a beverage first.');
     }
+  }
+
+  async function logout(){
+      removeTheToken();
+      alert('You have been logged out.');
+      window.location.href = 'index.html';
+  }
+
+  if (!isLoggedIn()) {
+    window.location.href = 'login.html';
   }
   
   updateCartDisplay();
